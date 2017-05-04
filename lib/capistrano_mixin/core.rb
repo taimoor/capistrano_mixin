@@ -66,7 +66,7 @@ if  Capistrano::Configuration.instance
 			desc "start faye server"
 			task :start_faye, :roles => :app, :except => { :no_release => true } do
 				within current_path do
-					run "bundle exec rackup faye.ru -s puma -E production"
+					run "bundle exec rackup faye.ru -s puma -E production &"
 				end
 			end
 		end
