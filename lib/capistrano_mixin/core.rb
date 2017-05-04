@@ -63,6 +63,12 @@ if  Capistrano::Configuration.instance
 			task :status do
 				run "sudo #{bluepill_bin} #{application} status"
 			end
+			desc "start faye server"
+			task :start_faye, :roles => :app, :except => { :no_release => true } do
+				within current_path do
+					run "bundle exec rackup faye.ru -s puma -E production"
+				end
+			end
 		end
 	end
 end
