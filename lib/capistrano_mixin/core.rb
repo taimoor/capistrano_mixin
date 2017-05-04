@@ -17,11 +17,11 @@ if  Capistrano::Configuration.instance
 		ssh_options[:forward_agent] = true
 
 		after "deploy:finalize_update", "db:symlink"
-        after "deploy:finalize_update", "faye_token:symlink"
+		after "deploy:finalize_update", "faye_token:symlink"
 		after "deploy:finalize_update", "sockets:symlink"
-		
 		after "deploy:finalize_update", "uploads:symlink"
-		
+		after 'deploy:finalize_update', 'faye:restart'
+
 	    namespace :uploads do
 	      task :symlink do
 	        run "rm -rf #{release_path}/public/uploads"
@@ -63,12 +63,15 @@ if  Capistrano::Configuration.instance
 			task :status do
 				run "sudo #{bluepill_bin} #{application} status"
 			end
-			desc "start faye server"
-			task :start_faye, :roles => :app, :except => { :no_release => true } do
-				within current_path do
-					run "bundle exec rackup faye.ru -s puma -E production &"
-				end
+		end
+
+		namespace :faye do
+			desc "Restart Faye"
+			task :restart do
+				run "sudo kill -9 $(lsof -i :9292 -t)"
+				run "cd #{current_path} && bundle exec rackup faye.ru -s puma -E production -D"
 			end
 		end
+
 	end
 end
