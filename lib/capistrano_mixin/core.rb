@@ -17,6 +17,7 @@ if  Capistrano::Configuration.instance
 		ssh_options[:forward_agent] = true
 
 		after "deploy:finalize_update", "db:symlink"
+        after "deploy:finalize_update", "faye_token:symlink"
 		after "deploy:finalize_update", "sockets:symlink"
 		
 		after "deploy:finalize_update", "uploads:symlink"
@@ -31,6 +32,11 @@ if  Capistrano::Configuration.instance
 		namespace :db do
 			task :symlink do
 				run "rm -f #{release_path}/config/database.yml && ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
+			end
+		end
+		namespace :faye_token do
+			task :symlink do
+				run "ln -nfs #{shared_path}/config/faye_token.rb #{release_path}/config/initializers/faye_token.rb"
 			end
 		end
 
